@@ -1,0 +1,652 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "a366aaf2",
+   "metadata": {},
+   "source": [
+    "<center>\n",
+    "\n",
+    "# Diplomatura en Ciencia de Datos, Aprendizaje Automático y sus Aplicaciones\n",
+    "    \n",
+    "## Práctico # 3. Aprendizaje supervisado o no supervisado\n",
+    "## <span style=\"color:red\">**Fecha de entrega:** 22 de septiembre de 2025</span>\n",
+    "## <span style=\"color:red\">**Fecha de entrega video 2:** 6 de octubre de 2025</span>\n",
+    "\n",
+    "</center>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4d0bb8f5",
+   "metadata": {},
+   "source": [
+    "--------------"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "55f1cfa8",
+   "metadata": {},
+   "source": [
+    "## Monitoreo y predicción de la contaminación del aire en Buenos Aires: un enfoque basado en datos"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "babf9086",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "La Organización Mundial de la Salud (OMS) estima que una de cada nueve muertes en el mundo está relacionada con la contaminación atmosférica. A pesar de su impacto en la salud, muchas regiones aún carecen de acceso a datos básicos sobre la calidad del aire. \n",
+    "\n",
+    "En la Ciudad de Buenos Aires, el monitoreo de contaminantes atmosféricos es fundamental para evaluar la calidad del aire y garantizar el cumplimiento de la Ley N.º 1356. \n",
+    "    \n",
+    "El objetivo general del proyecto es utilizar técnicas avanzadas de ciencia de datos para analizar, visualizar y predecir los niveles de contaminación atmosférica, superando retos como el tratamiento de datos faltantes o incorrectamente codificados (\"s/d\", null o sin registro).\n",
+    "\n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "46b86808",
+   "metadata": {},
+   "source": [
+    "## Objetivo del práctico 3"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "335b3b54",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "\n",
+    "En este tercer práctico de aprendizaje supervisado y/o no supervisado, aplicaremos modelos de clasificación, regresión, arboles de decisión o modelos más avanzados de Machine Learning como XGBoost, LightGBM, ARIMA y SARIMA para aprovechar los datos temporales recolectados en las cuatro zonas de Buenos Aires (Parque Centenario, Córdoba, La Boca y Palermo). \n",
+    "\n",
+    "El propósito es identificar y extraer los insights más significativos del dataset, así como evaluar y comparar diferentes modelos para determinar cuál de ellos proporcionan la mejor precisión y capacidad predictiva con relación a las preguntas planteadas inicialmente. \n",
+    "\n",
+    "A través de este análisis, buscaremos proponer acciones efectivas para mitigar los impactos en la salud pública y el medio ambiente relacionados con la contaminación atmosférica.   \n",
+    "\n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "def0dbb3",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "### Dataset:\n",
+    "    \n",
+    "En este proyecto, tendrás la oportunidad de trabajar con un conjunto de datos real proveniente de cuatro estaciones de monitoreo estratégicamente ubicadas en **Parque Centenario, Córdoba, La Boca y Palermo**. \n",
+    "    \n",
+    "El dataset cuenta con 132.486 registros y 21 variables que abarcan el periodo desde octubre de 2009 hasta enero de 2025. \n",
+    "\n",
+    "Contiene mediciones diarias de contaminantes críticos como son Monóxido de Carbono (CO), Dióxido de Nitrógeno (NO₂) y Material Particulado (PM₁₀).\n",
+    "\n",
+    "**Variables a analizar:**\n",
+    "    \n",
+    "1. **FECHA** (DD/MM/AAAA)\t\n",
+    "2. **HORA** (HH)\n",
+    "3. **CO_CENTENARIO**: Concentración de monóxido de carbono de la estación parque centenario, expresado en ppm.\n",
+    "4. **NO2_CENTENARIO**: Concentración de dióxido de nitrógeno de la estación parque centenario, expresado en ppb.\t\n",
+    "5. **PM10_CENTENARIO**: Concentración de material particulado de la estación parque centenario, expresado en µg/m3\t.\n",
+    "6. **CO_CORDOBA**: Concentración de monóxido de carbono de la estación Córdoba, expresado en ppm.\t\n",
+    "7. **NO2_CORDOBA**: Concentración de dióxido de nitrógeno de la estación Córdoba, expresado en ppb.\t\n",
+    "8. **PM10_CORDOBA**: Concentración de material particulado de la estación Córdoba, expresado en µg/m3.\t\n",
+    "9. **CO_LABOCA**: Concentración de monóxido de carbono de la estación La Boca, expresado en ppm.\t\n",
+    "10. **NO2_LABOCA**: Concentración de dióxido de nitrógeno de la estación La Boca, expresado en ppb. \t\n",
+    "11. **PM10_LABOCA**: Concentración de material particulado de la estación La Boca, expresado en µg/m3. \t\n",
+    "12. **CO_PALERMO**: Concentración de monóxido de carbono de la estación Palermo, expresado en ppm.\t\t\n",
+    "13. **NO2_PALERMO**: Concentración de dióxido de nitrógeno de la estación Palermo, expresado en ppb.\t\n",
+    "14. **PM10_PALERMO**: Concentración de material particulado de la estación Palermo, expresado en µg/m3. \t\n",
+    "15. **TEMP_PROM_MAX**: Temperatura mensual máxima de la ciudad de Buenos Aires.  \t\n",
+    "16. **TEMP_PROM_MIN**: Temperatura mensual mínima de la ciudad de Buenos Aires.  \t\n",
+    "17. **TEMP_PROM_MED**: Temperatura media mensual de la ciudad de Buenos Aires.  \t\n",
+    "18. **PRECIPITACIONES_mm**: Precipitaciones acumuladas mensuales en mililitros de agua. \n",
+    "19. **PRECIPITACIONES_días**: Días acumulados en el mes con precipitaciones.\n",
+    "20. **VELOCIDAD_VIENTO_Km/h**: Velocidad del viento mensual convertida a kilómetros por hora (Km/h). \n",
+    "21. **VELOCIDAD_VIENTO_nudos**: Velocidad del viento mensual medida en nudos. \n",
+    "\n",
+    "    \n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "64c6e50b",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "#### Para inspeccionar y descargar el conjunto de datos, acceder al siguiente repositorio:\n",
+    "\n",
+    "El conjunto de datos ha sido elaborado a partir de la información pública generada, almacenada y publicada por el Gobierno de la Ciudad de Buenos Aires. Los datos fueron tomados del siguiente enlace: https://data.buenosaires.gob.ar/dataset/calidad-aire \n",
+    "\n",
+    "El dataset completo se puede descargar en el enlace: https://github.com/PatriMiranda/Calidad_aire_buenosaires/blob/main/calidad-aire-buenosaires.xlsx  \n",
+    "\n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ab0521d9",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "### Preguntas a responder en el práctico 3:\n",
+    "\n",
+    "En esta etapa trataremos de responder algunas de las siguientes preguntas:  \n",
+    "    \n",
+    "   1. ¿Se pueden identificar patrones de contaminación del aire mediante técnicas de clustering?\n",
+    "   2. ¿Cuáles son los principales grupos o tendencias detectadas en la contaminación del aire de acuerdo con cada zona evaluada?\n",
+    "   3. ¿Qué variables ambientales y meteorológicas son más relevantes para predecir los niveles de CO, NO₂ y PM₁₀?\n",
+    "   4. ¿Qué precisión alcanzan los modelos de regresión al predecir los niveles de contaminación en función de la temperatura, la velocidad del viento y las precipitaciones?\n",
+    "   5. ¿Es posible predecir la contaminación en una estación a partir de los datos de otras estaciones cercanas?\n",
+    "   6. ¿Qué modelos de aprendizaje supervisado (regresión lineal, árboles de decisión, entre otras) ofrecen la mejor precisión en la predicción de la contaminación del aire?\n",
+    "\n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a1f8383a",
+   "metadata": {},
+   "source": [
+    "--------------"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "bbeeae41",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import matplotlib as mpl\n",
+    "import seaborn as sns\n",
+    "%matplotlib inline\n",
+    "from sklearn.linear_model import LinearRegression\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.ensemble import RandomForestRegressor\n",
+    "from sklearn.ensemble import RandomForestClassifier\n",
+    "from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error\n",
+    "from sklearn.metrics import classification_report\n",
+    "from mlxtend.feature_selection import SequentialFeatureSelector as SFS\n",
+    "import seaborn as sns\n",
+    "import statsmodels.api as sm"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "830e510a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>FECHA</th>\n",
+       "      <th>HORA</th>\n",
+       "      <th>CO_CENTENARIO</th>\n",
+       "      <th>NO2_CENTENARIO</th>\n",
+       "      <th>PM10_CENTENARIO</th>\n",
+       "      <th>CO_CORDOBA</th>\n",
+       "      <th>NO2_CORDOBA</th>\n",
+       "      <th>PM10_CORDOBA</th>\n",
+       "      <th>CO_LABOCA</th>\n",
+       "      <th>NO2_LABOCA</th>\n",
+       "      <th>PM10_LABOCA</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>21</td>\n",
+       "      <td>400.731367</td>\n",
+       "      <td>18.091188</td>\n",
+       "      <td>35.0</td>\n",
+       "      <td>57.681084</td>\n",
+       "      <td>28.408736</td>\n",
+       "      <td>25.6</td>\n",
+       "      <td>68.765372</td>\n",
+       "      <td>13.176899</td>\n",
+       "      <td>26.2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>23</td>\n",
+       "      <td>302.090562</td>\n",
+       "      <td>20.015523</td>\n",
+       "      <td>26.0</td>\n",
+       "      <td>69.217301</td>\n",
+       "      <td>62.543982</td>\n",
+       "      <td>23.8</td>\n",
+       "      <td>68.765372</td>\n",
+       "      <td>13.176899</td>\n",
+       "      <td>18.8</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2011-01-02</td>\n",
+       "      <td>0</td>\n",
+       "      <td>644.773633</td>\n",
+       "      <td>20.465131</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>80.516700</td>\n",
+       "      <td>46.787362</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>68.768013</td>\n",
+       "      <td>15.059892</td>\n",
+       "      <td>15.8</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>4</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>18</td>\n",
+       "      <td>400.731367</td>\n",
+       "      <td>17.715121</td>\n",
+       "      <td>33.0</td>\n",
+       "      <td>57.681084</td>\n",
+       "      <td>28.722242</td>\n",
+       "      <td>25.6</td>\n",
+       "      <td>68.765372</td>\n",
+       "      <td>15.059314</td>\n",
+       "      <td>26.2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>20</td>\n",
+       "      <td>400.731367</td>\n",
+       "      <td>18.109178</td>\n",
+       "      <td>34.0</td>\n",
+       "      <td>57.681084</td>\n",
+       "      <td>27.598317</td>\n",
+       "      <td>25.4</td>\n",
+       "      <td>80.226267</td>\n",
+       "      <td>15.059314</td>\n",
+       "      <td>26.2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>11</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>16</td>\n",
+       "      <td>407.551321</td>\n",
+       "      <td>18.401231</td>\n",
+       "      <td>34.0</td>\n",
+       "      <td>57.681084</td>\n",
+       "      <td>24.234468</td>\n",
+       "      <td>26.2</td>\n",
+       "      <td>68.765372</td>\n",
+       "      <td>16.941728</td>\n",
+       "      <td>24.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>2011-01-01</td>\n",
+       "      <td>22</td>\n",
+       "      <td>400.739419</td>\n",
+       "      <td>6.391718</td>\n",
+       "      <td>29.0</td>\n",
+       "      <td>57.681084</td>\n",
+       "      <td>32.453743</td>\n",
+       "      <td>22.0</td>\n",
+       "      <td>68.765372</td>\n",
+       "      <td>15.059314</td>\n",
+       "      <td>24.8</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        FECHA  HORA  CO_CENTENARIO  NO2_CENTENARIO  PM10_CENTENARIO  \\\n",
+       "0  2011-01-01     0       0.000000        0.000000              0.0   \n",
+       "1  2011-01-01    21     400.731367       18.091188             35.0   \n",
+       "2  2011-01-01    23     302.090562       20.015523             26.0   \n",
+       "3  2011-01-02     0     644.773633       20.465131             22.0   \n",
+       "4  2011-01-01     4       0.000000        0.000000              0.0   \n",
+       "5  2011-01-01    18     400.731367       17.715121             33.0   \n",
+       "6  2011-01-01    20     400.731367       18.109178             34.0   \n",
+       "7  2011-01-01    11       0.000000        0.000000              0.0   \n",
+       "8  2011-01-01    16     407.551321       18.401231             34.0   \n",
+       "9  2011-01-01    22     400.739419        6.391718             29.0   \n",
+       "\n",
+       "   CO_CORDOBA  NO2_CORDOBA  PM10_CORDOBA  CO_LABOCA  NO2_LABOCA  PM10_LABOCA  \n",
+       "0    0.000000     0.000000           0.0   0.000000    0.000000          0.0  \n",
+       "1   57.681084    28.408736          25.6  68.765372   13.176899         26.2  \n",
+       "2   69.217301    62.543982          23.8  68.765372   13.176899         18.8  \n",
+       "3   80.516700    46.787362          23.0  68.768013   15.059892         15.8  \n",
+       "4    0.000000     0.000000           0.0   0.000000    0.000000          0.0  \n",
+       "5   57.681084    28.722242          25.6  68.765372   15.059314         26.2  \n",
+       "6   57.681084    27.598317          25.4  80.226267   15.059314         26.2  \n",
+       "7    0.000000     0.000000           0.0   0.000000    0.000000          0.0  \n",
+       "8   57.681084    24.234468          26.2  68.765372   16.941728         24.0  \n",
+       "9   57.681084    32.453743          22.0  68.765372   15.059314         24.8  "
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Cargar el dataset\n",
+    "\n",
+    "df = pd.read_csv(\"https://raw.githubusercontent.com/PatriMiranda/Datos_imputados/refs/heads/main/datos_imputados.csv\")\n",
+    "df.head(10)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2b83690c-f0ac-4453-8d9d-d38185138b04",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "### 1. Selección de variables\n",
+    "    \n",
+    "* También conocido como Feature Selection, consiste en el proceso de seleccionar las características (variables) con más importancia en la variable a predecir.\n",
+    "\n",
+    "* Consiste en elegir un subconjunto relevante y significativo de las características (columnas) del dataset para mejorar el rendimiento del modelo y reducir la complejidad computacional.\n",
+    "\n",
+    "* Forward Elimination (Eliminación Hacia Adelante). El objetivo de este método es identificar el subconjunto de variables independientes que mejor predice la variable dependiente, mejorando así el rendimiento del modelo y evitando el sobreajuste. \n",
+    "\n",
+    "* Backward Elimination (Eliminación Hacia Atrás).Elimina variables de manera secuencial. \n",
+    "    \n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ef165982-b700-4e33-991b-d7ad61749457",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "### 2. Modelamiento\n",
+    "    \n",
+    "`from sklearn.model_selection import train_test_split`\n",
+    "\n",
+    "Dividir el conjunto de datos en entrenamiento y prueba\n",
+    "\n",
+    "`X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)`\n",
+    "\n",
+    "**Sintaxis:**\n",
+    "\n",
+    "Donde:\n",
+    "\n",
+    "*   **X:** Es el conjunto de características o variables independientes del conjunto de datos. Puede ser un DataFrame o una matriz NumPy.\n",
+    "*   **y:** Es la variable objetivo o etiqueta del conjunto de datos. Puede ser una Serie de pandas o un arreglo de una dimensión.\n",
+    "*   **test_size:** Es un valor entre 0 y 1 que representa el tamaño del conjunto de prueba en relación con el conjunto de datos completo. Por ejemplo, test_size=0.2 indica que el 20% de los datos se utilizará como conjunto de prueba, mientras que el 80% restante se utilizará como conjunto de entrenamiento.\n",
+    "\n",
+    "*   **random_state:** Es un número entero >=0 que se utiliza como semilla para el generador de números aleatorios. Se recomienda establecer un valor fijo para random_state cuando se quiere obtener siempre la misma división de datos, lo que facilita la comparación de resultados.\n",
+    "\n",
+    "</span>"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "id": "39a22c37-caf2-4134-aa77-089c956d04d8",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "## Algunos modelos propuestos\n",
+    "\n",
+    "### 1. Clustering\n",
+    "* **K-mean** - minimiza distancias, es rapido y muy utilizado\n",
+    "* **ST-DBSCAN** - usado en series de tiempo \n",
+    "* **PCA** - reduce dimensiones y luego aplica clustering\n",
+    "* **Hierarchical Clustering** - jerárquico\n",
+    "  \n",
+    "### 2. Para series temporales\n",
+    "* **Arima** - AutoRegressive Integrated Moving Average. Modela series temporales sin tener en cuenta la estacionalidad\n",
+    "* **Sarima** - Seasonal ARIMA. Incluye componentes estacionales. Es más adecuado para series con patrones que se repiten\n",
+    "* **Modelo VAR** - Vector Autoregressive Model. Para analizar series temporales multivariadas\n",
+    "\n",
+    "### 3. Modelos de Machine Learning avanzados - Manejan un mayor número de variables predictoras\n",
+    "* **Modelo de regresión lineal múltiple**\n",
+    "* **Modelo de regresión Lasso**\n",
+    "* **Modelo de regresión de Ridge**\n",
+    "* **Modelo de regresión Random Forest**\n",
+    "* **Regresión con XGBoost** - Extreme Gradient Boosting\n",
+    "* **Regresión con LightGBM** - Light Gradient Boosting Machine\n",
+    "\n",
+    "Visualizar las predicciones de cada modelo y analizar el comportamiento de la serie.\n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ea169409-78a5-47f1-bbc3-0cb28f0cae46",
+   "metadata": {},
+   "source": [
+    "<span style=\"font-family: Arial, sans-serif; font-size: 16px;\">\n",
+    "    \n",
+    "### 3. Validación del modelo\n",
+    "\n",
+    "Evaluar el rendimiento de los modelos, analizando las métricas\n",
+    "\n",
+    "Algunos ejemplos de métricas de modelos de regresión: \n",
+    "\n",
+    "* **MAE** - Error Absoluto Medio)\n",
+    "\n",
+    "* **RMSE** - Raíz del Error Cuadrático Medio)\n",
+    "\n",
+    "* **MAPE** - Error Porcentual Absoluto Medio)\n",
+    "\n",
+    "* **R2** - Coeficiente de determinación)\n",
+    "\n",
+    "Seleccionar el modelo que presenta el mejor desempeño para predecir el comportamiento futuro de los contaminates. \n",
+    "\n",
+    "</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "59f97ad3-3e86-4b1e-97ca-e7e33ad94a7a",
+   "metadata": {},
+   "source": [
+    "## Conclusiones finales"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a75a9c06-2a5b-4ccd-870a-d7d5cfe5bcb4",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c64a8d94",
+   "metadata": {},
+   "source": [
+    "## Referencias bibliográficas"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0e76a322",
+   "metadata": {},
+   "source": [
+    "OMS (2021). Directrices mundiales de la OMS sobre la calidad del aire: partículas en suspensión (PM2.5 y PM10),\n",
+    "ozono, dióxido de nitrógeno, dióxido de azufre y monóxido de carbono. Disponible en: https://iris.who.int/bitstream/handle/10665/346062/9789240035461-spa.pdf "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c37fb6ad",
+   "metadata": {},
+   "source": [
+    "FAO (2004). Ley Nº 1356 - Preservación del recurso aire y la prevención y control de la contaminación atmosférica. Disponible en: https://faolex.fao.org/docs/pdf/arg45497.pdf"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "805a3a7a",
+   "metadata": {},
+   "source": [
+    "ACUMAR (2021). Ficha metodológica - Indice de calidad de aire. Disponible en: https://www.acumar.gob.ar/wp-content/uploads/2016/12/Ficha-Metodologica-22.pdf?utm_source=chatgpt.com"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4f164757",
+   "metadata": {},
+   "source": [
+    "Gobierno de la Ciudad de Buenos Aires (s.f.). Red de Monitoreo de la Calidad del Aire – Estación 1. Agencia de Protección Ambiental (APRA). Disponible en: https://buenosaires.gob.ar/areas/med_ambiente/apra/calidad_amb/red_monitoreo/index.php?estacion=1&menu_id=34234"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ec313d0d-bf26-4ccd-a72e-8430d5c30408",
+   "metadata": {},
+   "source": [
+    "Ministerio de Salud Argentina (s.F). Vigilancia de infecciones respiratorias agudas. Disponible en: https://datos.gob.ar/it/dataset/salud-vigilancia-infecciones-respiratorias-agudas"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "af9f1e0b-85ee-4954-9923-8bc3c5fcb184",
+   "metadata": {},
+   "source": [
+    "Secretaria de transporte. Ministerio de Economía (S.F). Datos abiertos de la secretaria de trasnporte. Disponible en: https://datos.transporte.gob.ar/"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "338a3f08-b2c2-4872-99ea-2d137182ef85",
+   "metadata": {},
+   "source": [
+    "Buenos Aires data (s.F). Datos públicos generados por la ciudad de Buenos Aires. Disponible en: https://data.buenosaires.gob.ar/en/dataset/"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dabf4a11-dc6b-47a7-a06c-3e94d96c155b",
+   "metadata": {},
+   "source": [
+    "Indice de calidad de Aire Argentina. Disponible en: https://www.aqi.in/es/dashboard/argentina"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b6f5f25f-48d8-468f-9266-7eda3e4d5604",
+   "metadata": {},
+   "source": [
+    "Papers sobre modelamiento ambiental. https://drive.google.com/drive/folders/1RkRuE7gNP1U1vMZuR5qM5z_hIAVTqTY-?usp=sharing\n",
+    "\n",
+    "* A machine learning approach to address air quality changes during the COVID-19 lockdown in Buenos Aires, Argentina\n",
+    "* Air quality monitoring using statistical learning models for sustainable environment\n",
+    "* Air quality prediction models based on meteorological factors and real‐time data of industrial waste gas\n",
+    "* Air Quality Prediction: Big Data and Machine Learning Approaches\n",
+    "* Data-Driven Approaches for Predicting and Forecasting Air Quality in Urban Areas\n",
+    "* Enhancing urban air quality prediction using time-based-spatial forecasting framework\n",
+    "* High PM10 concentrations in the city of Buenos Aires and their relationship with meteorological conditions"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "26080c06-c45a-4165-a2df-9cad0b934472",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
